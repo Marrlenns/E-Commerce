@@ -15,4 +15,9 @@ public class TestController {
     public String bye(){
         return "Good Bye World!";
     }
+
+    @GetMapping("/salam")
+    public String salam(){
+        return "Salam World!";
+    }
 }
