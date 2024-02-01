@@ -10,6 +10,7 @@ E-commerce applications provide users with a seamless and convenient shopping ex
 
 - BackEnd Developer: [@Marlen](https://www.github.com/Marrlenns)
 - BackEnd Developer: [@Bermet](https://www.github.com/isbembi)
+- BackEnd Developer: [@Sanjar](https://www.github.com/Sanjar233)
 - FrontEnd Developer: [@Emir](https://www.github.com/Emirkeenz)
 
 
