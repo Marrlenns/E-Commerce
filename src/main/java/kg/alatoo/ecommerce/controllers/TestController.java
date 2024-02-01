@@ -20,4 +20,10 @@ public class TestController {
     public String salam(){
         return "Salam World!";
     }
+
+    @GetMapping("/adyl")
+    public String adyl(){
+        return "Adyl World!";
+    }
+
 }
