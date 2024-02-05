@@ -4,6 +4,10 @@ import kg.alatoo.ecommerce.dto.product.CategoryRequest;
 import kg.alatoo.ecommerce.dto.product.ProductRequest;
 import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.services.ProductService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
