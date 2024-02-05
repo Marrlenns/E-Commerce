@@ -7,4 +7,6 @@ public interface ProductService {
     void addCategory(CategoryRequest request);
 
     void addProduct(ProductRequest request);
+
+    void updateById(Long id, ProductRequest productRequest);
 }
