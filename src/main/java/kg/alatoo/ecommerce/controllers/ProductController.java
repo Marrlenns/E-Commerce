@@ -2,12 +2,10 @@ package kg.alatoo.ecommerce.controllers;
 
 import kg.alatoo.ecommerce.dto.product.CategoryRequest;
 import kg.alatoo.ecommerce.dto.product.ProductRequest;
+import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.services.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -24,8 +22,15 @@ public class ProductController {
 
     @PostMapping("/add/product")
     public String addProduct(@RequestBody ProductRequest request){
-//        System.out.println("marlen");
         productService.addProduct(request);
         return "Product: " + request.getTitle() + " - added successfully!";
+    }
+    @GetMapping("/update/{id}")
+    public void updateById(@PathVariable Long id,@RequestBody ProductRequest productRequest){
+        productService.updateById(id,productRequest);
+    }
+    @GetMapping("/show/{id}")
+    public ProductResponse showById(@PathVariable Long id){
+        return productService.showById(id);
     }
 }
