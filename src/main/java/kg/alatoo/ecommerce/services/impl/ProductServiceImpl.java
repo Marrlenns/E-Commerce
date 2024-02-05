@@ -2,6 +2,7 @@ package kg.alatoo.ecommerce.services.impl;
 
 import kg.alatoo.ecommerce.dto.product.CategoryRequest;
 import kg.alatoo.ecommerce.dto.product.ProductRequest;
+import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.entities.Category;
 import kg.alatoo.ecommerce.entities.Product;
 import kg.alatoo.ecommerce.enums.Color;
@@ -82,4 +83,22 @@ public class ProductServiceImpl implements ProductService {
         product.get().setSku(productRequest.getSku());
         productRepository.save(product.get());
     }
+    @Override
+    public ProductResponse showById(Long id){
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isEmpty())
+            throw new NotFoundException("the product with id: "+id+" is not found!", HttpStatus.BAD_REQUEST);
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setId(product.get().getId());
+        productResponse.setTitle(product.get().getTitle());
+        productResponse.setPrice(product.get().getPrice());
+        productResponse.setDescription(product.get().getDescription());
+        productResponse.setColors(product.get().getColors());
+        productResponse.setTags(product.get().getTags());
+        productResponse.setSizes(product.get().getSizes());
+        productResponse.setCategory(String.valueOf(product.get().getCategory()));
+        productResponse.setSku(product.get().getSku());
+        return productResponse;
+    }
+
 }
