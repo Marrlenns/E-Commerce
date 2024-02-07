@@ -64,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
         isCategory.get().setProducts(products);
         categoryRepository.save(isCategory.get());
     }
-    //    Che takoe sku
+  
     @Override
     public void updateById(Long id, ProductRequest productRequest){
         Optional<Product> product = productRepository.findById(id);
