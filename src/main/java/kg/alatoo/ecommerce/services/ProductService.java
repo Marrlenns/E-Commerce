@@ -12,4 +12,3 @@ public interface ProductService {
     void updateById(Long id, ProductRequest productRequest);
 
     ProductResponse showById(Long id);
-}

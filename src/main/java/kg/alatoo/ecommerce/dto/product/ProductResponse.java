@@ -22,5 +22,3 @@ public class ProductResponse {
     private List<Size> sizes;
     private String category;
     private String sku;
-}
-
