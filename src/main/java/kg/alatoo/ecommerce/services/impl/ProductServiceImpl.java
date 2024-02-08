@@ -5,6 +5,7 @@ import kg.alatoo.ecommerce.dto.product.ProductRequest;
 import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.entities.Category;
 import kg.alatoo.ecommerce.entities.Product;
+import kg.alatoo.ecommerce.entities.User;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
 import kg.alatoo.ecommerce.enums.Tag;
@@ -12,6 +13,8 @@ import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.repositories.CategoryRepository;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
+import kg.alatoo.ecommerce.repositories.UserRepository;
+import kg.alatoo.ecommerce.services.AuthService;
 import kg.alatoo.ecommerce.services.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final AuthService authService;
+    private final UserRepository userRepository;
 
     @Override
     public void addCategory(CategoryRequest request) {
@@ -39,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void addProduct(ProductRequest request) {
+    public void addProduct(ProductRequest request, String token) {
         Optional<Product> isProduct = productRepository.findBySku(request.getSku());
         if(isProduct.isPresent())
             throw new BadRequestException("Product with this SKU already exists!");
@@ -51,20 +56,35 @@ public class ProductServiceImpl implements ProductService {
         Optional<Category> isCategory = categoryRepository.findByTitle(request.getCategory());
         if(isCategory.isEmpty())
             throw new BadRequestException("This category doesn't exist!");
+
+        User user = authService.getUserFromToken(token);
+
         product.setCategory(isCategory.get());
         product.setSizes(request.getSizes());
         product.setColors(request.getColors());
         product.setTags(request.getTags());
-        productRepository.save(product);
-
-        ArrayList<Product> products = new ArrayList<>();
+        Product product1 = productRepository.saveAndFlush(product);
+        connectUserProduct(product1, user);
+        List<Product> products = new ArrayList<>();
         if(!isCategory.get().getProducts().isEmpty())
-            products = (ArrayList<Product>) isCategory.get().getProducts();
+            products = isCategory.get().getProducts();
         products.add(product);
         isCategory.get().setProducts(products);
         categoryRepository.save(isCategory.get());
     }
-  
+
+    private void connectUserProduct(Product product, User user) {
+        product.setUser(user);
+        productRepository.save(product);
+
+        List<Product> products = new ArrayList<>();
+        if(!user.getProducts().isEmpty())
+            products = user.getProducts();
+        products.add(product);
+        user.setProducts(products);
+        userRepository.save(user);
+    }
+
     @Override
     public void updateById(Long id, ProductRequest productRequest){
         Optional<Product> product = productRepository.findById(id);

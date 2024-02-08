@@ -81,14 +81,14 @@ public class AuthServiceImpl implements AuthService {
         String[] chunks = token.substring(7).split("\\.");
         Base64.Decoder decoder = Base64.getUrlDecoder();
         if (chunks.length != 3)
-            throw new BadCredentialsException("Wrong token");
+            throw new BadCredentialsException("U can't add product!");
         JSONParser jsonParser = new JSONParser();
         JSONObject object = null;
         try {
             byte[] decodedBytes = decoder.decode(chunks[1]);
             object = (JSONObject) jsonParser.parse(decodedBytes);
         } catch (ParseException e) {
-            throw new BadCredentialsException("Wrong token");
+            throw new BadCredentialsException("U can't add product!");
         }
         return userRepository.findByUsername(String.valueOf(object.get("sub"))).orElseThrow(() -> new BadCredentialsException("User with this token doesn't exist in database"));
     }

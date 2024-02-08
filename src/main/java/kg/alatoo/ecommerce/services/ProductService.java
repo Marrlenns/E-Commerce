@@ -7,7 +7,7 @@ import kg.alatoo.ecommerce.dto.product.ProductResponse;
 public interface ProductService {
     void addCategory(CategoryRequest request);
 
-    void addProduct(ProductRequest request);
+    void addProduct(ProductRequest request, String token);
 
     void updateById(Long id, ProductRequest productRequest);
 

@@ -41,4 +41,7 @@ public class Product {
     @ManyToOne
     private Category category;
 
+    @ManyToOne
+    private User user;
+
 }
