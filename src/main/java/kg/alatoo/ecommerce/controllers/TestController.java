@@ -21,4 +21,9 @@ public class TestController {
     public String salam(){
         return "Salam World!";
     }
+
+    @GetMapping("/salam2")
+    public String salam2(){
+        return "Salam World!";
+    }
 }
