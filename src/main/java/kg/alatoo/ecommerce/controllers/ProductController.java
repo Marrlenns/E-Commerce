@@ -1,5 +1,6 @@
 package kg.alatoo.ecommerce.controllers;
 
+import io.swagger.annotations.Authorization;
 import kg.alatoo.ecommerce.dto.product.CategoryRequest;
 import kg.alatoo.ecommerce.dto.product.ProductRequest;
 import kg.alatoo.ecommerce.dto.product.ProductResponse;
@@ -25,8 +26,8 @@ public class ProductController {
     }
 
     @PostMapping("/add/product")
-    public String addProduct(@RequestBody ProductRequest request){
-        productService.addProduct(request);
+    public String addProduct(@RequestBody ProductRequest request, @RequestHeader("Authorization") String token){
+        productService.addProduct(request, token);
         return "Product: " + request.getTitle() + " - added successfully!";
     }
     @GetMapping("/update/{id}")
