@@ -30,10 +30,18 @@ public class ProductController {
         productService.addProduct(request, token);
         return "Product: " + request.getTitle() + " - added successfully!";
     }
-    @GetMapping("/update/{id}")
-    public void updateById(@PathVariable Long id,@RequestBody ProductRequest productRequest){
-        productService.updateById(id,productRequest);
+    @PutMapping("/update/{id}")
+    public String updateById(@PathVariable Long id,@RequestBody ProductRequest productRequest, @RequestHeader("Authorization") String token){
+        productService.updateById(id,productRequest, token);
+        return "Product with id: " + id + " - updated successfully!";
     }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteById(@PathVariable Long id, @RequestHeader("Authorization") String token){
+        productService.deleteById(id, token);
+        return "Product with id: " + id + " - deleted successfully!";
+    }
+
     @GetMapping("/show/{id}")
     public ProductResponse showById(@PathVariable Long id){
         return productService.showById(id);

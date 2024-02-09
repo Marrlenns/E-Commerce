@@ -9,6 +9,7 @@ import kg.alatoo.ecommerce.entities.User;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
 import kg.alatoo.ecommerce.enums.Tag;
+import kg.alatoo.ecommerce.exceptions.BadCredentialsException;
 import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.repositories.CategoryRepository;
@@ -86,10 +87,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateById(Long id, ProductRequest productRequest){
+    public void updateById(Long id, ProductRequest productRequest, String token){
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
-            throw new NotFoundException("the product with id: "+id+" is empty!", HttpStatus.BAD_REQUEST);
+            throw new NotFoundException("Product with id: " + id + " - doesn't exist!", HttpStatus.BAD_REQUEST);
+        User user = authService.getUserFromToken(token);
+        if(product.get().getUser() != user)
+            throw new BadCredentialsException("U can't update this product!");
+
         product.get().setTitle(productRequest.getTitle());
         product.get().setPrice(productRequest.getPrice());
         product.get().setDescription(productRequest.getDescription());
@@ -100,9 +105,44 @@ public class ProductServiceImpl implements ProductService {
         if(isCategory.isEmpty())
             throw new BadRequestException("This category doesn't exist!");
         product.get().setCategory(isCategory.get());
-        product.get().setSku(productRequest.getSku());
+        Optional<Product> product1 = productRepository.findBySku(productRequest.getSku());
+        if(product1.isEmpty() || product1.get() == product.get())
+            product.get().setSku(productRequest.getSku());
+        else
+            throw new BadRequestException("Product with this sku already exist!");
         productRepository.save(product.get());
     }
+    @Override
+    public void deleteById(Long id, String token) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isEmpty())
+            throw new BadRequestException("Product with id: " + id + " - doesn't exist!");
+        User user = authService.getUserFromToken(token);
+        if(product.get().getUser() != user)
+            throw new BadCredentialsException("U can't delete this product!");
+        List<Product> products = user.getProducts();
+        List<Product> newProducts = new ArrayList<>();
+        for(Product product1: products)
+            if(product1 != product.get())
+                newProducts.add(product1);
+        user.setProducts(newProducts);
+        product.get().setUser(null);
+        products = product.get().getCategory().getProducts();
+        newProducts = new ArrayList<>();
+        Category category = product.get().getCategory();
+        for(Product product1: products)
+            if(product1 != product.get()) {
+                newProducts.add(product1);
+            }
+        category.setProducts(newProducts);
+        product.get().setCategory(null);
+
+        userRepository.save(user);
+        productRepository.delete(product.get());
+        categoryRepository.save(category);
+
+    }
+
     @Override
     public ProductResponse showById(Long id){
         Optional<Product> product = productRepository.findById(id);
@@ -116,7 +156,7 @@ public class ProductServiceImpl implements ProductService {
         productResponse.setColors(product.get().getColors());
         productResponse.setTags(product.get().getTags());
         productResponse.setSizes(product.get().getSizes());
-        productResponse.setCategory(String.valueOf(product.get().getCategory()));
+        productResponse.setCategory(product.get().getCategory().getTitle());
         productResponse.setSku(product.get().getSku());
         return productResponse;
     }
