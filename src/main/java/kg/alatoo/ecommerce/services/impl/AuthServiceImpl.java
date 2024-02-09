@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
 
         Optional<User> user = userRepository.findByUsername(authLoginRequest.getUsername());
         if (user.isEmpty())
-            throw new BadCredentialsException("Credentials are incorrect!");
+            throw new IllegalArgumentException("Invalid username or password!");
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authLoginRequest.getUsername(),authLoginRequest.getPassword()));
         }catch (org.springframework.security.authentication.BadCredentialsException e){
@@ -81,14 +81,14 @@ public class AuthServiceImpl implements AuthService {
         String[] chunks = token.substring(7).split("\\.");
         Base64.Decoder decoder = Base64.getUrlDecoder();
         if (chunks.length != 3)
-            throw new BadCredentialsException("U can't add product!");
+            throw new BadCredentialsException("Wrong token!");
         JSONParser jsonParser = new JSONParser();
         JSONObject object = null;
         try {
             byte[] decodedBytes = decoder.decode(chunks[1]);
             object = (JSONObject) jsonParser.parse(decodedBytes);
         } catch (ParseException e) {
-            throw new BadCredentialsException("U can't add product!");
+            throw new BadCredentialsException("Wrong token!");
         }
         return userRepository.findByUsername(String.valueOf(object.get("sub"))).orElseThrow(() -> new BadCredentialsException("User with this token doesn't exist in database"));
     }
