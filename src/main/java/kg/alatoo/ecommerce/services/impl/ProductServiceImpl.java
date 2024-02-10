@@ -87,27 +87,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateById(Long id, ProductRequest productRequest, String token){
+    public void updateById(Long id, ProductRequest request, String token){
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
             throw new NotFoundException("Product with id: " + id + " - doesn't exist!", HttpStatus.BAD_REQUEST);
         User user = authService.getUserFromToken(token);
         if(product.get().getUser() != user)
             throw new BadCredentialsException("U can't update this product!");
-
-        product.get().setTitle(productRequest.getTitle());
-        product.get().setPrice(productRequest.getPrice());
-        product.get().setDescription(productRequest.getDescription());
-        product.get().setColors(productRequest.getColors());
-        product.get().setTags(productRequest.getTags());
-        product.get().setSizes(productRequest.getSizes());
-        Optional<Category> isCategory = categoryRepository.findByTitle(productRequest.getCategory());
+        if(request.getTitle() != null)
+            product.get().setTitle(request.getTitle());
+        if(request.getPrice() != null)
+            product.get().setPrice(request.getPrice());
+        if(request.getDescription() != null)
+            product.get().setDescription(request.getDescription());
+        if(request.getColors() != null)
+            product.get().setColors(request.getColors());
+        if(request.getTags() != null)
+            product.get().setTags(request.getTags());
+        if(request.getSizes() != null)
+            product.get().setSizes(request.getSizes());
+        Optional<Category> isCategory = categoryRepository.findByTitle(request.getCategory());
         if(isCategory.isEmpty())
             throw new BadRequestException("This category doesn't exist!");
         product.get().setCategory(isCategory.get());
-        Optional<Product> product1 = productRepository.findBySku(productRequest.getSku());
-        if(product1.isEmpty() || product1.get() == product.get())
-            product.get().setSku(productRequest.getSku());
+        Optional<Product> product1 = productRepository.findBySku(request.getSku());
+        if(request.getSku() != null && (product1.isEmpty() || product1.get() == product.get()))
+            product.get().setSku(request.getSku());
         else
             throw new BadRequestException("Product with this sku already exist!");
         productRepository.save(product.get());

@@ -88,8 +88,8 @@ public class AuthServiceImpl implements AuthService {
             byte[] decodedBytes = decoder.decode(chunks[1]);
             object = (JSONObject) jsonParser.parse(decodedBytes);
         } catch (ParseException e) {
-            throw new BadCredentialsException("Wrong token!");
+            throw new BadCredentialsException("Wrong token!!");
         }
-        return userRepository.findByUsername(String.valueOf(object.get("sub"))).orElseThrow(() -> new BadCredentialsException("User with this token doesn't exist in database"));
+        return userRepository.findByUsername(String.valueOf(object.get("sub"))).orElseThrow(() -> new BadCredentialsException("Wrong token!!!"));
     }
 }
