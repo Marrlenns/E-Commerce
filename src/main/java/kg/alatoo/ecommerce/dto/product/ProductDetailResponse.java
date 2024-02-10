@@ -15,7 +15,7 @@ import java.util.List;
 public class ProductDetailResponse {
     private Long id;
     private String title;
-    private Double rating;
+    private String rating;
     private Integer price;
     private String description;
     private List<Color> colors;

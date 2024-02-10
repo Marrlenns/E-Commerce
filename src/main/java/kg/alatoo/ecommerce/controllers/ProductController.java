@@ -1,6 +1,5 @@
 package kg.alatoo.ecommerce.controllers;
 
-import io.swagger.annotations.Authorization;
 import kg.alatoo.ecommerce.dto.product.*;
 import kg.alatoo.ecommerce.services.ProductService;
 import kg.alatoo.ecommerce.services.ReviewService;
@@ -75,6 +74,11 @@ public class ProductController {
     public String deleteReview(@RequestHeader("Authorization") String token, @PathVariable Long id, @PathVariable Long idd){
         reviewService.deleteReview(token, id, idd);
         return "Review deleted successfully!";
+    }
+
+    @GetMapping("/{id}/compare/{idd}")
+    public ProductComparisonResponse compareProducts(@PathVariable Long id, @PathVariable Long idd){
+        return productService.compare(id, idd);
     }
 
 }

@@ -19,4 +19,5 @@ public interface ProductService {
 
     List<ProductResponse> allByOwner(Long id);
 
+    ProductComparisonResponse compare(Long id, Long idd);
 }
