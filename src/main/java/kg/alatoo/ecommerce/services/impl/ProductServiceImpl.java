@@ -175,5 +175,16 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toDetailDto(product.get());
     }
 
+    @Override
+    public ProductComparisonResponse compare(Long id, Long idd) {
+        Optional<Product> product1 = productRepository.findById(id);
+        Optional<Product> product2 = productRepository.findById(idd);
+        if(product1.isEmpty())
+            throw new BadRequestException("Product with id: " + id + " - doesn't exist!");
+        if(product2.isEmpty())
+            throw new BadRequestException("Product with id: " + idd + " - doesn't exist!");
+        return productMapper.toCompareDtos(product1.get(), product2.get());
+    }
+
 }
 
