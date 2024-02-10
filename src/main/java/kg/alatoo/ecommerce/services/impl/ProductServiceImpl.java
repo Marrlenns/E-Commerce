@@ -1,11 +1,9 @@
 package kg.alatoo.ecommerce.services.impl;
 
-import kg.alatoo.ecommerce.dto.product.CategoryRequest;
-import kg.alatoo.ecommerce.dto.product.ProductDetailResponse;
-import kg.alatoo.ecommerce.dto.product.ProductRequest;
-import kg.alatoo.ecommerce.dto.product.ProductResponse;
+import kg.alatoo.ecommerce.dto.product.*;
 import kg.alatoo.ecommerce.entities.Category;
 import kg.alatoo.ecommerce.entities.Product;
+import kg.alatoo.ecommerce.entities.Review;
 import kg.alatoo.ecommerce.entities.User;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
@@ -164,6 +162,30 @@ public class ProductServiceImpl implements ProductService {
             throw new BadRequestException("This user doesn't exist!");
         List<Product> products = productRepository.findAllByUser(user.get());
         return productMapper.toDtos(products);
+    }
+
+    @Override
+    public void addReview(Long id, String token, ReviewRequest request) {
+        Optional<Product> product = productRepository.findById(id);
+
+        if(product.isEmpty())
+            throw new BadRequestException("Product with id: " + id + " - doesn't exist!");
+
+        User user = authService.getUserFromToken(token);
+
+        Review review = new Review();
+        review.setText(request.getText());
+        review.setId(review.getId());
+        review.setStars(review.getStars());
+        review.setProduct(product.get());
+        review.setUser(user);
+//        Review review1 =
+
+        List<Review> reviews = new ArrayList<>();
+        if(product.get().getReviews() != null)
+            reviews = product.get().getReviews();
+//        reviews.
+
     }
 
     @Override

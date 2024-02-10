@@ -1,10 +1,7 @@
 package kg.alatoo.ecommerce.controllers;
 
 import io.swagger.annotations.Authorization;
-import kg.alatoo.ecommerce.dto.product.CategoryRequest;
-import kg.alatoo.ecommerce.dto.product.ProductDetailResponse;
-import kg.alatoo.ecommerce.dto.product.ProductRequest;
-import kg.alatoo.ecommerce.dto.product.ProductResponse;
+import kg.alatoo.ecommerce.dto.product.*;
 import kg.alatoo.ecommerce.services.ProductService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +42,7 @@ public class ProductController {
         return "Product with id: " + id + " - deleted successfully!";
     }
 
-    @GetMapping("/show/{id}")
+    @GetMapping("/{id}")
     public ProductDetailResponse showById(@PathVariable Long id){
         return productService.showById(id);
     }
@@ -58,5 +55,11 @@ public class ProductController {
     @GetMapping("/all/{id}")
     public List<ProductResponse> allByOwner(@PathVariable Long id){
         return productService.allByOwner(id);
+    }
+
+    @PostMapping("/{id}/add/review")
+    public String addReview(@RequestBody ReviewRequest request, @PathVariable Long id, @RequestHeader("Authorization") String token){
+        productService.addReview(id, token, request);
+        return "Review added successfully!";
     }
 }
