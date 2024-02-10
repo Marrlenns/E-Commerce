@@ -3,6 +3,7 @@ package kg.alatoo.ecommerce.mappers.impl;
 import kg.alatoo.ecommerce.dto.product.ProductDetailResponse;
 import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.entities.Product;
+import kg.alatoo.ecommerce.entities.Review;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.mappers.ProductMapper;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
@@ -47,6 +48,14 @@ public class ProductMapperImpl implements ProductMapper {
         productResponse.setSizes(product.getSizes());
         productResponse.setCategory(product.getCategory().getTitle());
         productResponse.setSku(product.getSku());
+        double rating = 0;
+        List<String> reviews = new ArrayList<>();
+        for(Review review: product.getReviews()){
+            rating += review.getStars();
+            reviews.add(review.getText());
+        }
+        productResponse.setReviews(reviews);
+        productResponse.setRating(rating / product.getReviews().size());
         return productResponse;
     }
 }

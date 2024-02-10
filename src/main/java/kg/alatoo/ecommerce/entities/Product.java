@@ -44,4 +44,7 @@ public class Product {
     @ManyToOne
     private User user;
 
+    @OneToMany
+    private List<Review> reviews;
+
 }

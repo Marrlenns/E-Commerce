@@ -1,11 +1,9 @@
 package kg.alatoo.ecommerce.services.impl;
 
-import kg.alatoo.ecommerce.dto.product.CategoryRequest;
-import kg.alatoo.ecommerce.dto.product.ProductDetailResponse;
-import kg.alatoo.ecommerce.dto.product.ProductRequest;
-import kg.alatoo.ecommerce.dto.product.ProductResponse;
+import kg.alatoo.ecommerce.dto.product.*;
 import kg.alatoo.ecommerce.entities.Category;
 import kg.alatoo.ecommerce.entities.Product;
+import kg.alatoo.ecommerce.entities.Review;
 import kg.alatoo.ecommerce.entities.User;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
@@ -16,6 +14,7 @@ import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.mappers.ProductMapper;
 import kg.alatoo.ecommerce.repositories.CategoryRepository;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
+import kg.alatoo.ecommerce.repositories.ReviewRepository;
 import kg.alatoo.ecommerce.repositories.UserRepository;
 import kg.alatoo.ecommerce.services.AuthService;
 import kg.alatoo.ecommerce.services.ProductService;
@@ -36,6 +35,8 @@ public class ProductServiceImpl implements ProductService {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final ProductMapper productMapper;
+    private final ReviewRepository reviewRepository;
+
 
     @Override
     public void addCategory(CategoryRequest request) {
@@ -154,6 +155,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> all() {
         List<Product> products = productRepository.findAll();
+        return productMapper.toDtos(products);
+    }
+
+    @Override
+    public List<ProductResponse> allByOwner(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty())
+            throw new BadRequestException("This user doesn't exist!");
+        List<Product> products = productRepository.findAllByUser(user.get());
         return productMapper.toDtos(products);
     }
 
