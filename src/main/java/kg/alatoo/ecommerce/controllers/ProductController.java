@@ -54,4 +54,9 @@ public class ProductController {
     public List<ProductResponse> all(){
         return productService.all();
     }
+
+    @GetMapping("/all/{id}")
+    public List<ProductResponse> allByOwner(@PathVariable Long id){
+        return productService.allByOwner(id);
+    }
 }

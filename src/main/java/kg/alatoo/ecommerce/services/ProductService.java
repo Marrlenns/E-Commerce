@@ -19,4 +19,6 @@ public interface ProductService {
     void deleteById(Long id, String token);
 
     List<ProductResponse> all();
+
+    List<ProductResponse> allByOwner(Long id);
 }

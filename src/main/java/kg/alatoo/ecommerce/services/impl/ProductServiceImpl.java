@@ -158,6 +158,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductResponse> allByOwner(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty())
+            throw new BadRequestException("This user doesn't exist!");
+        List<Product> products = productRepository.findAllByUser(user.get());
+        return productMapper.toDtos(products);
+    }
+
+    @Override
     public ProductDetailResponse showById(Long id){
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
