@@ -1,6 +1,7 @@
 package kg.alatoo.ecommerce.services.impl;
 
 import kg.alatoo.ecommerce.dto.product.CategoryRequest;
+import kg.alatoo.ecommerce.dto.product.ProductDetailResponse;
 import kg.alatoo.ecommerce.dto.product.ProductRequest;
 import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.entities.Category;
@@ -12,6 +13,7 @@ import kg.alatoo.ecommerce.enums.Tag;
 import kg.alatoo.ecommerce.exceptions.BadCredentialsException;
 import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
+import kg.alatoo.ecommerce.mappers.ProductMapper;
 import kg.alatoo.ecommerce.repositories.CategoryRepository;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
 import kg.alatoo.ecommerce.repositories.UserRepository;
@@ -33,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final ProductMapper productMapper;
 
     @Override
     public void addCategory(CategoryRequest request) {
@@ -149,21 +152,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse showById(Long id){
+    public List<ProductResponse> all() {
+        List<Product> products = productRepository.findAll();
+        return productMapper.toDtos(products);
+    }
+
+    @Override
+    public ProductDetailResponse showById(Long id){
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
-            throw new NotFoundException("the product with id: "+id+" is not found!", HttpStatus.BAD_REQUEST);
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(product.get().getId());
-        productResponse.setTitle(product.get().getTitle());
-        productResponse.setPrice(product.get().getPrice());
-        productResponse.setDescription(product.get().getDescription());
-        productResponse.setColors(product.get().getColors());
-        productResponse.setTags(product.get().getTags());
-        productResponse.setSizes(product.get().getSizes());
-        productResponse.setCategory(product.get().getCategory().getTitle());
-        productResponse.setSku(product.get().getSku());
-        return productResponse;
+            throw new NotFoundException("Product with id: "+id+" is not found!", HttpStatus.BAD_REQUEST);
+        return productMapper.toDetailDto(product.get());
     }
 
 }

@@ -2,6 +2,7 @@ package kg.alatoo.ecommerce.controllers;
 
 import io.swagger.annotations.Authorization;
 import kg.alatoo.ecommerce.dto.product.CategoryRequest;
+import kg.alatoo.ecommerce.dto.product.ProductDetailResponse;
 import kg.alatoo.ecommerce.dto.product.ProductRequest;
 import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.services.ProductService;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/product")
 public class ProductController {
 
     private final ProductService productService;
@@ -25,7 +28,7 @@ public class ProductController {
         return "Category: " + request.getTitle() + " - added successfully!";
     }
 
-    @PostMapping("/add/product")
+    @PostMapping("/add")
     public String addProduct(@RequestBody ProductRequest request, @RequestHeader("Authorization") String token){
         productService.addProduct(request, token);
         return "Product: " + request.getTitle() + " - added successfully!";
@@ -43,7 +46,12 @@ public class ProductController {
     }
 
     @GetMapping("/show/{id}")
-    public ProductResponse showById(@PathVariable Long id){
+    public ProductDetailResponse showById(@PathVariable Long id){
         return productService.showById(id);
+    }
+
+    @GetMapping("/all")
+    public List<ProductResponse> all(){
+        return productService.all();
     }
 }
