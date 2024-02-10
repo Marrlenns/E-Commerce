@@ -3,6 +3,7 @@ package kg.alatoo.ecommerce.controllers;
 import io.swagger.annotations.Authorization;
 import kg.alatoo.ecommerce.dto.product.*;
 import kg.alatoo.ecommerce.services.ProductService;
+import kg.alatoo.ecommerce.services.ReviewService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ReviewService reviewService;
 
     @PostMapping("/add/category")
     public String addCategory(@RequestBody CategoryRequest request){
@@ -59,7 +61,20 @@ public class ProductController {
 
     @PostMapping("/{id}/add/review")
     public String addReview(@RequestBody ReviewRequest request, @PathVariable Long id, @RequestHeader("Authorization") String token){
-        productService.addReview(id, token, request);
+        reviewService.addReview(id, token, request);
         return "Review added successfully!";
     }
+
+    @PutMapping("{id}/review/update/{idd}")
+    public String updateReview(@RequestBody ReviewRequest request, @PathVariable Long id, @PathVariable long idd, @RequestHeader("Authorization") String token){
+        reviewService.updateReview(id, token, request, idd);
+        return "Review updated successfully!";
+    }
+
+    @DeleteMapping("{id}/review/delete/{idd}")
+    public String deleteReview(@RequestHeader("Authorization") String token, @PathVariable Long id, @PathVariable Long idd){
+        reviewService.deleteReview(token, id, idd);
+        return "Review deleted successfully!";
+    }
+
 }

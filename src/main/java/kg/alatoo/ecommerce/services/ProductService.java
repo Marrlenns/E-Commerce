@@ -19,5 +19,4 @@ public interface ProductService {
 
     List<ProductResponse> allByOwner(Long id);
 
-    void addReview(Long id, String token, ReviewRequest request);
 }

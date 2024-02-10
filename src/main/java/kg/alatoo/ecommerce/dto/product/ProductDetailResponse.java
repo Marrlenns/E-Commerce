@@ -15,6 +15,7 @@ import java.util.List;
 public class ProductDetailResponse {
     private Long id;
     private String title;
+    private Double rating;
     private Integer price;
     private String description;
     private List<Color> colors;
@@ -22,4 +23,5 @@ public class ProductDetailResponse {
     private List<Size> sizes;
     private String category;
     private String sku;
+    private List<String> reviews;
 }

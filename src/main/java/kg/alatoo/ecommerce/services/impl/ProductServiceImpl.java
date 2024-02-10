@@ -14,6 +14,7 @@ import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.mappers.ProductMapper;
 import kg.alatoo.ecommerce.repositories.CategoryRepository;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
+import kg.alatoo.ecommerce.repositories.ReviewRepository;
 import kg.alatoo.ecommerce.repositories.UserRepository;
 import kg.alatoo.ecommerce.services.AuthService;
 import kg.alatoo.ecommerce.services.ProductService;
@@ -34,6 +35,8 @@ public class ProductServiceImpl implements ProductService {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final ProductMapper productMapper;
+    private final ReviewRepository reviewRepository;
+
 
     @Override
     public void addCategory(CategoryRequest request) {
@@ -162,30 +165,6 @@ public class ProductServiceImpl implements ProductService {
             throw new BadRequestException("This user doesn't exist!");
         List<Product> products = productRepository.findAllByUser(user.get());
         return productMapper.toDtos(products);
-    }
-
-    @Override
-    public void addReview(Long id, String token, ReviewRequest request) {
-        Optional<Product> product = productRepository.findById(id);
-
-        if(product.isEmpty())
-            throw new BadRequestException("Product with id: " + id + " - doesn't exist!");
-
-        User user = authService.getUserFromToken(token);
-
-        Review review = new Review();
-        review.setText(request.getText());
-        review.setId(review.getId());
-        review.setStars(review.getStars());
-        review.setProduct(product.get());
-        review.setUser(user);
-//        Review review1 =
-
-        List<Review> reviews = new ArrayList<>();
-        if(product.get().getReviews() != null)
-            reviews = product.get().getReviews();
-//        reviews.
-
     }
 
     @Override
