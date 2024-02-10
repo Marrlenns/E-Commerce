@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @OneToMany
     private List<Product> products;
 
+    @OneToMany
+    private List<Review> reviews;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null)
