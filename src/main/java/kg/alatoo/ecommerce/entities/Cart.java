@@ -1,7 +1,6 @@
 package kg.alatoo.ecommerce.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,9 +14,6 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer total;
-
-
 
     @OneToOne
     private User user;

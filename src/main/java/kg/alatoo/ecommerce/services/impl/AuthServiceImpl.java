@@ -4,9 +4,11 @@ import  kg.alatoo.ecommerce.config.JwtService;
 import  kg.alatoo.ecommerce.dto.AuthLoginRequest;
 import  kg.alatoo.ecommerce.dto.AuthLoginResponse;
 import  kg.alatoo.ecommerce.dto.UserRegisterRequest;
+import kg.alatoo.ecommerce.entities.Cart;
 import  kg.alatoo.ecommerce.entities.User;
 import  kg.alatoo.ecommerce.enums.Role;
 import  kg.alatoo.ecommerce.exceptions.BadCredentialsException;
+import kg.alatoo.ecommerce.repositories.CartRepository;
 import  kg.alatoo.ecommerce.repositories.UserRepository;
 import  kg.alatoo.ecommerce.services.AuthService;
 import lombok.AllArgsConstructor;
@@ -27,10 +29,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private  UserRepository userRepository;
-    private  PasswordEncoder encoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
     private final JwtService jwtService;
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final CartRepository cartRepository;
 
     @Override
     public void register(UserRegisterRequest request) {
@@ -42,8 +45,12 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(encoder.encode(request.getPassword()));
         user.setRole(Role.CLIENT);
-
-        userRepository.save(user);
+        User user1 = userRepository.save(user);
+        Cart cart = new Cart();
+        cart.setUser(user);
+        Cart cart1 = cartRepository.saveAndFlush(cart);
+        user1.setCart(cart1);
+        userRepository.save(user1);
 
     }
 
