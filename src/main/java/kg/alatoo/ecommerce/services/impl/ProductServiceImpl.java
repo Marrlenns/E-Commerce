@@ -171,7 +171,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailResponse showById(Long id){
         Optional<Product> product = productRepository.findById(id);
         if (product.isEmpty())
-            throw new NotFoundException("Product with id: "+id+" is not found!", HttpStatus.BAD_REQUEST);
+            throw new NotFoundException("Product with id: "+id+" - doesn't found!", HttpStatus.BAD_REQUEST);
         return productMapper.toDetailDto(product.get());
     }
 
