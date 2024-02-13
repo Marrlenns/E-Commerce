@@ -15,6 +15,8 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ElementCollection
+    private List<Integer> subtotals;
     private Integer total;
 
 

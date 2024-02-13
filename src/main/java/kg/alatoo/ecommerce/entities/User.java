@@ -31,6 +31,9 @@ public class User implements UserDetails {
     @OneToMany
     private List<Review> reviews;
 
+    @OneToOne
+    private Cart cart;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null)
