@@ -1,11 +1,13 @@
 package kg.alatoo.ecommerce.services.impl;
 
 import kg.alatoo.ecommerce.dto.cart.AddToCartRequest;
+import kg.alatoo.ecommerce.dto.cart.CartResponse;
 import kg.alatoo.ecommerce.entities.Cart;
 import kg.alatoo.ecommerce.entities.CartItem;
 import kg.alatoo.ecommerce.entities.Product;
 import kg.alatoo.ecommerce.entities.User;
 import kg.alatoo.ecommerce.exceptions.BadRequestException;
+import kg.alatoo.ecommerce.mappers.CartMapper;
 import kg.alatoo.ecommerce.repositories.CartItemRepository;
 import kg.alatoo.ecommerce.repositories.CartRepository;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
@@ -28,6 +30,7 @@ public class CartServiceImpl implements CartService {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final CartMapper cartMapper;
 
     @Override
     public void add(AddToCartRequest request, String token) {
@@ -91,5 +94,12 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
         item.get().setCart(null);
         cartItemRepository.delete(item.get());
+    }
+
+    @Override
+    public CartResponse show(String token) {
+        User user = authService.getUserFromToken(token);
+        Cart cart = cartRepository.findById(user.getId()).get();
+        return cartMapper.toDto(cart);
     }
 }

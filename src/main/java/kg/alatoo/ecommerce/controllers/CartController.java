@@ -2,6 +2,7 @@ package kg.alatoo.ecommerce.controllers;
 
 
 import kg.alatoo.ecommerce.dto.cart.AddToCartRequest;
+import kg.alatoo.ecommerce.dto.cart.CartResponse;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
 import kg.alatoo.ecommerce.services.CartService;
 import lombok.AllArgsConstructor;
@@ -32,4 +33,10 @@ public class CartController {
         cartService.delete(request, token);
         return "Product deleted successfully!";
     }
+
+    @GetMapping("/show")
+    public CartResponse showCart(@RequestHeader("Authorization") String token){
+        return cartService.show(token);
+    }
+
 }
