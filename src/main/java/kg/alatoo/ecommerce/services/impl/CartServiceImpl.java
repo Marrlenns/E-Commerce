@@ -37,10 +37,11 @@ public class CartServiceImpl implements CartService {
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
 
         CartItem item = new CartItem();
-        item.setProduct(product.get().getTitle());
+        item.setTitle(product.get().getTitle());
         item.setPrice(product.get().getPrice());
         item.setQuantity(request.getQuantity());
         item.setSubtotal(product.get().getPrice() * request.getQuantity());
+        item.setCart(user.getCart());
 
         CartItem cartItem = cartItemRepository.saveAndFlush(item);
 
@@ -50,5 +51,45 @@ public class CartServiceImpl implements CartService {
         items.add(cartItem);
         cart.setItems(items);
         cartRepository.save(cart);
+    }
+
+    @Override
+    public void update(AddToCartRequest request, String token) {
+        User user = authService.getUserFromToken(token);
+        Cart cart = cartRepository.findById(user.getId()).get();
+        Optional<CartItem> product = cartItemRepository.findById(request.getProductId());
+        if(product.isEmpty())
+            throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
+        List<CartItem> items = cart.getItems();
+        boolean flag = false;
+        for(CartItem item: items)
+            if(item.getTitle() == product.get().getTitle()){
+                item.setQuantity(request.getQuantity());
+                flag = true;
+                cartItemRepository.save(item);
+                break;
+            }
+        if(!flag)
+            throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist in your cart!");
+    }
+
+    @Override
+    public void delete(AddToCartRequest request, String token) {
+        User user = authService.getUserFromToken(token);
+        Cart cart = cartRepository.findById(user.getId()).get();
+        Optional<CartItem> item = cartItemRepository.findById(request.getProductId());
+        if(item.isEmpty())
+            throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
+        if(item.get().getCart() != cart)
+            throw new BadRequestException("You can't delete this product!");
+        List<CartItem> items = cart.getItems();
+        List<CartItem> newItems = new ArrayList<>();
+        for(CartItem cartItem: items)
+            if(cartItem != item.get())
+                newItems.add(cartItem);
+        cart.setItems(newItems);
+        cartRepository.save(cart);
+        item.get().setCart(null);
+        cartItemRepository.delete(item.get());
     }
 }

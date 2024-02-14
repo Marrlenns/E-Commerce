@@ -20,4 +20,16 @@ public class CartController {
         cartService.add(request, token);
         return productRepository.findById(request.getProductId()).get().getTitle() + " added to your cart!";
     }
+
+    @PutMapping("/update")
+    public String updateCart(@RequestBody AddToCartRequest request, @RequestHeader("Authorization") String token){
+        cartService.update(request, token);
+        return "Quantity updated successfully!";
+    }
+
+    @DeleteMapping("/delete")
+    public String deleteCart(@RequestBody AddToCartRequest request, @RequestHeader("Authorization") String token){
+        cartService.delete(request, token);
+        return "Product deleted successfully!";
+    }
 }
