@@ -2,6 +2,7 @@ package kg.alatoo.ecommerce.controllers;
 
 
 import kg.alatoo.ecommerce.dto.cart.AddToCartRequest;
+import kg.alatoo.ecommerce.dto.cart.CartResponse;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
 import kg.alatoo.ecommerce.services.CartService;
 import lombok.AllArgsConstructor;
@@ -20,4 +21,22 @@ public class CartController {
         cartService.add(request, token);
         return productRepository.findById(request.getProductId()).get().getTitle() + " added to your cart!";
     }
+
+    @PutMapping("/update")
+    public String updateCart(@RequestBody AddToCartRequest request, @RequestHeader("Authorization") String token){
+        cartService.update(request, token);
+        return "Quantity updated successfully!";
+    }
+
+    @DeleteMapping("/delete")
+    public String deleteCart(@RequestBody AddToCartRequest request, @RequestHeader("Authorization") String token){
+        cartService.delete(request, token);
+        return "Product deleted successfully!";
+    }
+
+    @GetMapping("/show")
+    public CartResponse showCart(@RequestHeader("Authorization") String token){
+        return cartService.show(token);
+    }
+
 }

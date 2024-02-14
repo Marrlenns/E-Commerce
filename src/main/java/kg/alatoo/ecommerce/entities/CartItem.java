@@ -9,10 +9,10 @@ import lombok.Data;
 public class CartItem {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String product;
+    private String title;
     private Integer price;
     private Integer quantity;
     private Integer subtotal;
