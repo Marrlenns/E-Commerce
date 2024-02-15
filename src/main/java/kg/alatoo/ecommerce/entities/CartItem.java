@@ -16,6 +16,7 @@ public class CartItem {
     private Integer price;
     private Integer quantity;
     private Integer subtotal;
+    private String sku;
 
     @ManyToOne
     private Cart cart;

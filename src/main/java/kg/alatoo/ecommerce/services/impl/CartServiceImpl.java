@@ -15,6 +15,7 @@ import kg.alatoo.ecommerce.repositories.UserRepository;
 import kg.alatoo.ecommerce.services.AuthService;
 import kg.alatoo.ecommerce.services.CartService;
 import lombok.AllArgsConstructor;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,11 +36,20 @@ public class CartServiceImpl implements CartService {
     @Override
     public void add(AddToCartRequest request, String token) {
         User user = authService.getUserFromToken(token);
+        Cart cart = cartRepository.findById(user.getId()).get();
+        System.out.println(user.getUsername());
+        if(cart.getItems().size() == 10)
+            throw new BadRequestException("Your card is full!");
         Optional<Product> product = productRepository.findById(request.getProductId());
-        if(product.isEmpty())
+        if(product.isEmpty()) {
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
-
+        }
+        Optional<CartItem> isItem = cartItemRepository.findBySkuAndCart(product.get().getSku(), cart);
+        if(isItem.isPresent() && isItem.get().getCart() == cart) {
+            throw new BadRequestException("You already added this product to your cart!");
+        }
         CartItem item = new CartItem();
+        item.setSku(product.get().getSku());
         item.setTitle(product.get().getTitle());
         item.setPrice(product.get().getPrice());
         item.setQuantity(request.getQuantity());
@@ -48,7 +58,6 @@ public class CartServiceImpl implements CartService {
 
         CartItem cartItem = cartItemRepository.saveAndFlush(item);
 
-        Cart cart = cartRepository.findById(user.getId()).get();
         List<CartItem> items = new ArrayList<>();
         if(cart.getItems() != null) items = cart.getItems();
         items.add(cartItem);
@@ -60,20 +69,24 @@ public class CartServiceImpl implements CartService {
     public void update(AddToCartRequest request, String token) {
         User user = authService.getUserFromToken(token);
         Cart cart = cartRepository.findById(user.getId()).get();
-        Optional<CartItem> product = cartItemRepository.findById(request.getProductId());
-        if(product.isEmpty())
+        Optional<CartItem> item = cartItemRepository.findById(request.getProductId());
+        if(item.isEmpty())
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
-        List<CartItem> items = cart.getItems();
-        boolean flag = false;
-        for(CartItem item: items)
-            if(item.getTitle() == product.get().getTitle()){
-                item.setQuantity(request.getQuantity());
-                flag = true;
-                cartItemRepository.save(item);
-                break;
-            }
-        if(!flag)
+//        if(item.get().getCart() != cart)
+//            throw new BadRequestException("You doesn't have this product in your cart!");
+        if(item.get().getCart() != cart)
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist in your cart!");
+        item.get().setQuantity(request.getQuantity());
+        cartItemRepository.save(item.get());
+//        List<CartItem> items = cart.getItems();
+//        boolean flag = false;
+//        for(CartItem item: items)
+//            if(item.getTitle() == product.get().getTitle()){
+//                item.setQuantity(request.getQuantity());
+//                flag = true;
+//                cartItemRepository.save(item);
+//                break;
+//            }
     }
 
     @Override
