@@ -34,6 +34,17 @@ public class User implements UserDetails {
     @OneToOne
     private Cart cart;
 
+    private String firstName;
+    private String lastName;
+    private String companyName;
+    private String country;
+    private String streetAddress;
+    private String city;
+    private String province;
+    private String zipCode;
+    private String phone;
+    private String additionalInfo;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null)
