@@ -1,5 +1,8 @@
 package kg.alatoo.ecommerce.services.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import  kg.alatoo.ecommerce.config.JwtService;
 import  kg.alatoo.ecommerce.dto.AuthLoginRequest;
 import  kg.alatoo.ecommerce.dto.AuthLoginResponse;
@@ -20,6 +23,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.net.http.HttpHeaders;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +66,10 @@ public class AuthServiceImpl implements AuthService {
         if (user.isEmpty())
             throw new IllegalArgumentException("Invalid username or password!");
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authLoginRequest.getUsername(),authLoginRequest.getPassword()));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authLoginRequest.getUsername(),authLoginRequest.getPassword()
+                    ));
         }catch (org.springframework.security.authentication.BadCredentialsException e){
             throw new BadCredentialsException("Credentials are incorrect!");
         }
@@ -71,13 +79,12 @@ public class AuthServiceImpl implements AuthService {
 
     private AuthLoginResponse convertToResponse(User user) {
         AuthLoginResponse response = new AuthLoginResponse();
-        response.setUsername(user.getUsername());
-        response.setId(user.getId());
-        response.setEmail(user.getEmail());
         Map<String, Object> extraClaims = new HashMap<>();
 
         String token = jwtService.generateToken(extraClaims, user);
-        response.setToken(token);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        response.setAccessToken(token);
+        response.setRefreshToken(refreshToken);
 
         return response;
     }
@@ -98,5 +105,27 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Wrong token!!");
         }
         return userRepository.findByUsername(String.valueOf(object.get("sub"))).orElseThrow(() -> new BadCredentialsException("Wrong token!!!"));
+    }
+
+    @Override
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String authHeader = request.getHeader("Authorization");
+        final String refreshToken;
+        final String username;
+        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+            return;
+        }
+        refreshToken = authHeader.substring(7);
+        username = jwtService.extractUsername(refreshToken);
+        if(username != null){
+            var userDetails = this.userRepository.findByUsername(username).orElseThrow();
+            if(jwtService.isTokenValid(refreshToken, userDetails)){
+                var accessToken = jwtService.generateToken(userDetails);
+                AuthLoginResponse authResponse = new AuthLoginResponse();
+                authResponse.setAccessToken(accessToken);
+                authResponse.setRefreshToken(refreshToken);
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            }
+        }
     }
 }
