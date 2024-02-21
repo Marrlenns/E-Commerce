@@ -8,10 +8,13 @@ import  kg.alatoo.ecommerce.dto.AuthLoginRequest;
 import  kg.alatoo.ecommerce.dto.AuthLoginResponse;
 import  kg.alatoo.ecommerce.dto.UserRegisterRequest;
 import kg.alatoo.ecommerce.entities.Cart;
+import kg.alatoo.ecommerce.entities.Token;
 import  kg.alatoo.ecommerce.entities.User;
 import  kg.alatoo.ecommerce.enums.Role;
+import kg.alatoo.ecommerce.enums.TokenType;
 import  kg.alatoo.ecommerce.exceptions.BadCredentialsException;
 import kg.alatoo.ecommerce.repositories.CartRepository;
+import kg.alatoo.ecommerce.repositories.TokenRepository;
 import  kg.alatoo.ecommerce.repositories.UserRepository;
 import  kg.alatoo.ecommerce.services.AuthService;
 import lombok.AllArgsConstructor;
@@ -39,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CartRepository cartRepository;
+    private final TokenRepository tokenRepository;
 
     @Override
     public void register(UserRegisterRequest request) {
@@ -83,6 +87,8 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(extraClaims, user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user, token);
         response.setAccessToken(token);
         response.setRefreshToken(refreshToken);
 
@@ -118,14 +124,38 @@ public class AuthServiceImpl implements AuthService {
         refreshToken = authHeader.substring(7);
         username = jwtService.extractUsername(refreshToken);
         if(username != null){
-            var userDetails = this.userRepository.findByUsername(username).orElseThrow();
-            if(jwtService.isTokenValid(refreshToken, userDetails)){
-                var accessToken = jwtService.generateToken(userDetails);
+            var user = this.userRepository.findByUsername(username).orElseThrow();
+            if(jwtService.isTokenValid(refreshToken, user)){
+                var accessToken = jwtService.generateToken(user);
                 AuthLoginResponse authResponse = new AuthLoginResponse();
                 authResponse.setAccessToken(accessToken);
                 authResponse.setRefreshToken(refreshToken);
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken);
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
     }
 }
