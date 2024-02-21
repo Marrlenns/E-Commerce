@@ -45,6 +45,9 @@ public class User implements UserDetails {
     private String phone;
     private String additionalInfo;
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null)
