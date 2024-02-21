@@ -6,8 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuthLoginResponse {
-    private Long id;
-    private String username;
-    private String email;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 }
