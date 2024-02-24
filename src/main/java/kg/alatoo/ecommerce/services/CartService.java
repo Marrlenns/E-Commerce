@@ -11,4 +11,6 @@ public interface CartService {
     void delete(AddToCartRequest request, String token);
 
     CartResponse show(String token);
+
+    void buy(String token);
 }

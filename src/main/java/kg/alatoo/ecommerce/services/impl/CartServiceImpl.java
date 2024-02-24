@@ -115,4 +115,19 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findById(user.getId()).get();
         return cartMapper.toDto(cart);
     }
+
+    @Override
+    public void buy(String token) {
+        User user = authService.getUserFromToken(token);
+        Cart cart = cartRepository.findById(user.getId()).get();
+        if(cart.getItems().size() == 0)
+            throw new BadRequestException("Your cart is empty!");
+        List<CartItem> items = cart.getItems();
+        for (CartItem item: items) item.setCart(null);
+
+        cart.setItems(null);
+        cartRepository.save(cart);
+        for (CartItem item: items) cartItemRepository.delete(item);
+
+    }
 }

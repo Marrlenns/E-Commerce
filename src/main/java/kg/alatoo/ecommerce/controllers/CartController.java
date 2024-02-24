@@ -39,4 +39,10 @@ public class CartController {
         return cartService.show(token);
     }
 
+    @PostMapping("/buy")
+    public String buyCart(@RequestHeader("Authorization") String token){
+        cartService.buy(token);
+        return "Products bought succesfully!";
+    }
+
 }
