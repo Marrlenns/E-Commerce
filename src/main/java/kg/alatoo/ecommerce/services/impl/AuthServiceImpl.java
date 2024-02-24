@@ -18,24 +18,26 @@ import kg.alatoo.ecommerce.repositories.CartRepository;
 import kg.alatoo.ecommerce.repositories.TokenRepository;
 import  kg.alatoo.ecommerce.repositories.UserRepository;
 import  kg.alatoo.ecommerce.services.AuthService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.http.HttpHeaders;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -44,11 +46,15 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final CartRepository cartRepository;
     private final TokenRepository tokenRepository;
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Override
     public void register(UserRegisterRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent())
             throw new BadCredentialsException("User with username: " + request.getUsername() + " is already exist!");
+
+        sendEmail(request.getEmail());
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -62,6 +68,18 @@ public class AuthServiceImpl implements AuthService {
         user1.setCart(cart1);
         userRepository.save(user1);
 
+    }
+
+    private void sendEmail(String email) {
+        if(email == null)
+            throw new BadRequestException("Please, write your email!");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("marlenormonbaev@gmail.com");
+        message.setTo(email);
+        message.setText("Welcome to our site!");
+        message.setSubject("E-Commerce");
+        mailSender.send(message);
     }
 
     @Override
@@ -159,4 +177,5 @@ public class AuthServiceImpl implements AuthService {
         });
         tokenRepository.saveAll(validUserTokens);
     }
+
 }
