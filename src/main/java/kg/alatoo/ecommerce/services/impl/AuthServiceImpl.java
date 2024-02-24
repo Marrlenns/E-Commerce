@@ -13,6 +13,7 @@ import  kg.alatoo.ecommerce.entities.User;
 import  kg.alatoo.ecommerce.enums.Role;
 import kg.alatoo.ecommerce.enums.TokenType;
 import  kg.alatoo.ecommerce.exceptions.BadCredentialsException;
+import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.repositories.CartRepository;
 import kg.alatoo.ecommerce.repositories.TokenRepository;
 import  kg.alatoo.ecommerce.repositories.UserRepository;
@@ -68,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
         Optional<User> user = userRepository.findByUsername(authLoginRequest.getUsername());
         if (user.isEmpty())
-            throw new IllegalArgumentException("Invalid username or password!");
+            throw new BadRequestException("Invalid username or password!");
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
