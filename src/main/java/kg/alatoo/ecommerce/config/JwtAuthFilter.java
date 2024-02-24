@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.repositories.TokenRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             var isTokenValid = tokenRepository.findByToken(jwt)
-                    .map(t -> !t.isExpired() && !t.isRevoked())
+                    .map(token -> !token.isExpired() && !token.isRevoked())
                     .orElse(false);
             if(jwtService.isTokenValid(jwt, userDetails) && isTokenValid){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
