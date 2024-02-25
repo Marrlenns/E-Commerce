@@ -54,13 +54,11 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.findByUsername(request.getUsername()).isPresent())
             throw new BadCredentialsException("User with username: " + request.getUsername() + " is already exist!");
 
-        sendEmail(request.getEmail());
-
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
         user.setPassword(encoder.encode(request.getPassword()));
         user.setRole(Role.CLIENT);
+        user.setVerified(false);
         User user1 = userRepository.saveAndFlush(user);
         Cart cart = new Cart();
         cart.setUser(user);
@@ -68,18 +66,6 @@ public class AuthServiceImpl implements AuthService {
         user1.setCart(cart1);
         userRepository.save(user1);
 
-    }
-
-    private void sendEmail(String email) {
-        if(email == null)
-            throw new BadRequestException("Please, write your email!");
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("marlenormonbaev@gmail.com");
-        message.setTo(email);
-        message.setText("Welcome to our site!");
-        message.setSubject("E-Commerce");
-        mailSender.send(message);
     }
 
     @Override
