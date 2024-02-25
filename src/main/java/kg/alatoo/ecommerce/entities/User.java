@@ -44,6 +44,8 @@ public class User implements UserDetails {
     private String zipCode;
     private String phone;
     private String additionalInfo;
+    private String verifyCode;
+    private boolean verified;
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
