@@ -77,6 +77,7 @@ public class CartServiceImpl implements CartService {
         if(item.get().getCart() != cart)
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist in your cart!");
         item.get().setQuantity(request.getQuantity());
+        item.get().setSubtotal(request.getQuantity() * item.get().getPrice());
         cartItemRepository.save(item.get());
 //        List<CartItem> items = cart.getItems();
 //        boolean flag = false;

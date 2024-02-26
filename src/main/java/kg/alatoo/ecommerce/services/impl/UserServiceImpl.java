@@ -37,8 +37,6 @@ public class UserServiceImpl implements UserService {
         }
 
 
-        if(request.getEmail() != null)
-            user.setEmail(request.getEmail());
         if(request.getFirstName() != null)
             user.setFirstName(request.getFirstName());
         if(request.getLastName() != null)

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -45,7 +46,8 @@ public class User implements UserDetails {
     private String phone;
     private String additionalInfo;
     private String verifyCode;
-    private boolean verified;
+    private Boolean verified;
+    private String uuid;
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
