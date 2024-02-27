@@ -72,22 +72,11 @@ public class CartServiceImpl implements CartService {
         Optional<CartItem> item = cartItemRepository.findById(request.getProductId());
         if(item.isEmpty())
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
-//        if(item.get().getCart() != cart)
-//            throw new BadRequestException("You doesn't have this product in your cart!");
         if(item.get().getCart() != cart)
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist in your cart!");
         item.get().setQuantity(request.getQuantity());
         item.get().setSubtotal(request.getQuantity() * item.get().getPrice());
         cartItemRepository.save(item.get());
-//        List<CartItem> items = cart.getItems();
-//        boolean flag = false;
-//        for(CartItem item: items)
-//            if(item.getTitle() == product.get().getTitle()){
-//                item.setQuantity(request.getQuantity());
-//                flag = true;
-//                cartItemRepository.save(item);
-//                break;
-//            }
     }
 
     @Override
@@ -99,12 +88,7 @@ public class CartServiceImpl implements CartService {
             throw new BadRequestException("Product with id: " + request.getProductId() + " - doesn't exist!");
         if(item.get().getCart() != cart)
             throw new BadRequestException("You can't delete this product!");
-        List<CartItem> items = cart.getItems();
-        List<CartItem> newItems = new ArrayList<>();
-        for(CartItem cartItem: items)
-            if(cartItem != item.get())
-                newItems.add(cartItem);
-        cart.setItems(newItems);
+        cart.getItems().remove(item.get());
         cartRepository.save(cart);
         item.get().setCart(null);
         cartItemRepository.delete(item.get());
