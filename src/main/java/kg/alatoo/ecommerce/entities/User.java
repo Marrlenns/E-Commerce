@@ -48,6 +48,8 @@ public class User implements UserDetails {
     private String verifyCode;
     private Boolean verified;
     private String uuid;
+    @ManyToMany
+    private List<Product> favorites;
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
