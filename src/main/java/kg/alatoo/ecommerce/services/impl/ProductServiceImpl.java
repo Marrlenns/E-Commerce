@@ -129,21 +129,11 @@ public class ProductServiceImpl implements ProductService {
         User user = authService.getUserFromToken(token);
         if(product.get().getUser() != user)
             throw new BadCredentialsException("U can't delete this product!");
-        List<Product> products = user.getProducts();
-        List<Product> newProducts = new ArrayList<>();
-        for(Product product1: products)
-            if(product1 != product.get())
-                newProducts.add(product1);
-        user.setProducts(newProducts);
+
+        user.getProducts().remove(product.get());
         product.get().setUser(null);
-        products = product.get().getCategory().getProducts();
-        newProducts = new ArrayList<>();
         Category category = product.get().getCategory();
-        for(Product product1: products)
-            if(product1 != product.get()) {
-                newProducts.add(product1);
-            }
-        category.setProducts(newProducts);
+        category.getProducts().remove(product.get());
         product.get().setCategory(null);
 
         userRepository.save(user);

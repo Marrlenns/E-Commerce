@@ -96,20 +96,9 @@ public class ReviewServiceImpl implements ReviewService {
         if(review.get().getProduct() != product.get())
             throw new BadRequestException("This product doesn't have this review!");
 
-        List<Review> uReviews = user.getReviews();
-        List<Review> pReviews = product.get().getReviews();
-        List<Review> userReviews = new ArrayList<>();
-        List<Review> productReviews = new ArrayList<>();
+        user.getReviews().remove(review.get());
+        product.get().getReviews().remove(review.get());
 
-        for(Review review1: uReviews)
-            if(review1 != review.get())
-                userReviews.add(review1);
-        for(Review review1: pReviews)
-            if(review1 != review.get())
-                productReviews.add(review1);
-
-        user.setReviews(userReviews);
-        product.get().setReviews(productReviews);
         userRepository.save(user);
         productRepository.save(product.get());
 

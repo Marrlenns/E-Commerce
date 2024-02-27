@@ -47,4 +47,7 @@ public class Product {
     @OneToMany
     private List<Review> reviews;
 
+    @OneToMany
+    private List<User> users;
+
 }
