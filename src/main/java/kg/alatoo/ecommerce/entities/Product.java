@@ -7,6 +7,7 @@ import kg.alatoo.ecommerce.enums.Tag;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,6 +20,7 @@ public class Product {
     private Long id;
     private String title;
     private Integer price;
+    @Column(columnDefinition = "text")
     private String description;
 
     @ElementCollection(targetClass = Color.class, fetch = FetchType.EAGER)
@@ -49,5 +51,4 @@ public class Product {
 
     @OneToMany
     private List<User> users;
-
 }
