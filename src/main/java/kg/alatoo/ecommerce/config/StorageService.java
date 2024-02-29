@@ -19,7 +19,7 @@ import java.io.IOException;
 @Slf4j
 public class StorageService {
 
-//    @Value()
+    @Value("${application.bucket.name}")
     private String bucketName;
 
     @Autowired
