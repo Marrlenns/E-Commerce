@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/email/recovery", "api/v1/email/recovery-password").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/email/recovery", "api/v1/email/recovery-password", "file/**").permitAll()
                     .anyRequest().authenticated())
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider)
