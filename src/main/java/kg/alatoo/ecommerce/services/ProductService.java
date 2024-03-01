@@ -1,6 +1,7 @@
 package kg.alatoo.ecommerce.services;
 
 import kg.alatoo.ecommerce.dto.product.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface ProductService {
     List<ProductResponse> allByOwner(Long id);
 
     ProductComparisonResponse compare(Long id, Long idd);
+
+    void uploadFile(String token, MultipartFile file, Long productId);
 }

@@ -1,10 +1,7 @@
 package kg.alatoo.ecommerce.services.impl;
 
 import kg.alatoo.ecommerce.dto.product.*;
-import kg.alatoo.ecommerce.entities.Category;
-import kg.alatoo.ecommerce.entities.Product;
-import kg.alatoo.ecommerce.entities.Review;
-import kg.alatoo.ecommerce.entities.User;
+import kg.alatoo.ecommerce.entities.*;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
 import kg.alatoo.ecommerce.enums.Tag;
@@ -17,10 +14,12 @@ import kg.alatoo.ecommerce.repositories.ProductRepository;
 import kg.alatoo.ecommerce.repositories.ReviewRepository;
 import kg.alatoo.ecommerce.repositories.UserRepository;
 import kg.alatoo.ecommerce.services.AuthService;
+import kg.alatoo.ecommerce.services.ImageService;
 import kg.alatoo.ecommerce.services.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
     private final ProductMapper productMapper;
     private final ReviewRepository reviewRepository;
+    private final ImageService imageService;
 
 
     @Override
@@ -174,6 +174,27 @@ public class ProductServiceImpl implements ProductService {
         if(product2.isEmpty())
             throw new BadRequestException("Product with id: " + idd + " - doesn't exist!");
         return productMapper.toCompareDtos(product1.get(), product2.get());
+    }
+
+    @Override
+    public void uploadFile(String token, MultipartFile file, Long id) {
+        User user = authService.getUserFromToken(token);
+        Product product = productRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("product not found!" + id, HttpStatus.NOT_FOUND));
+        if(user != product.getUser())
+            throw new BadRequestException("You can't edit this product!");
+
+        if(product.getImage() != null){
+            Image image = product.getImage();
+            product.setImage(null);
+            Image save = imageService.uploadFile(file, image);
+            product.setImage(save);
+            productRepository.save(product);
+        } else{
+            Image save = imageService.uploadFile(file);
+            product.setImage(save);
+            productRepository.save(product);
+        }
     }
 
 }
