@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -17,8 +19,13 @@ public class Image {
     @Column(name = "path")
     private String path;
 
-    @OneToOne(mappedBy = "image")
+    @OneToOne
     private Product product;
 
+    @OneToMany
+    private List<CartItem> items;
+
+    @OneToMany
+    private List<Order> orders;
 
 }

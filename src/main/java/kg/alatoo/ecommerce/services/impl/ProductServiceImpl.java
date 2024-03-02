@@ -9,10 +9,7 @@ import kg.alatoo.ecommerce.exceptions.BadCredentialsException;
 import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.mappers.ProductMapper;
-import kg.alatoo.ecommerce.repositories.CategoryRepository;
-import kg.alatoo.ecommerce.repositories.ProductRepository;
-import kg.alatoo.ecommerce.repositories.ReviewRepository;
-import kg.alatoo.ecommerce.repositories.UserRepository;
+import kg.alatoo.ecommerce.repositories.*;
 import kg.alatoo.ecommerce.services.AuthService;
 import kg.alatoo.ecommerce.services.ImageService;
 import kg.alatoo.ecommerce.services.ProductService;
@@ -36,6 +33,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ReviewRepository reviewRepository;
     private final ImageService imageService;
+    private final ImageRepository imageRepository;
+    private final CartItemRepository cartItemRepository;
+    private final OrderRepository orderRepository;
 
 
     @Override
@@ -183,18 +183,38 @@ public class ProductServiceImpl implements ProductService {
                 new NotFoundException("product not found!" + id, HttpStatus.NOT_FOUND));
         if(user != product.getUser())
             throw new BadRequestException("You can't edit this product!");
-
+        Image save;
+        List<Order> orders = null;
+        List<CartItem> items = null;
         if(product.getImage() != null){
             Image image = product.getImage();
-            product.setImage(null);
-            Image save = imageService.uploadFile(file, image);
-            product.setImage(save);
-            productRepository.save(product);
-        } else{
-            Image save = imageService.uploadFile(file);
-            product.setImage(save);
-            productRepository.save(product);
-        }
+            items = image.getItems();
+            orders = image.getOrders();
+            save = imageService.uploadFile(file, image);
+            if(items != null){
+                List<CartItem> itemList = new ArrayList<>();
+                for(CartItem item: items){
+                    item.setImage(save);
+                    itemList.add(item);
+                    cartItemRepository.save(item);
+                }
+                save.setItems(itemList);
+            }
+            if(orders != null){
+                List<Order> orderList = new ArrayList<>();
+                for(Order order: orders){
+                    order.setImage(save);
+                    orderList.add(order);
+                    orderRepository.save(order);
+                }
+                save.setOrders(orderList);
+            }
+        } else save = imageService.uploadFile(file);
+
+        product.setImage(save);
+        productRepository.save(product);
+        save.setProduct(product);
+        imageRepository.save(save);
     }
 
 }

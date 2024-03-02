@@ -35,6 +35,9 @@ public class User implements UserDetails {
     @OneToOne
     private Cart cart;
 
+    @OneToMany
+    private List<Order> orders;
+
     private String firstName;
     private String lastName;
     private String companyName;

@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 public class ProductResponse {
     private Long id;
+    private String imageName;
     private String title;
     private Integer price;
     private String category;

@@ -2,6 +2,7 @@ package kg.alatoo.ecommerce.dto.product;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import kg.alatoo.ecommerce.dto.image.ImageResponse;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
 import kg.alatoo.ecommerce.enums.Tag;
@@ -14,6 +15,7 @@ import java.util.List;
 @Setter
 public class ProductDetailResponse {
     private Long id;
+    private ImageResponse image;
     private String title;
     private String rating;
     private Integer price;

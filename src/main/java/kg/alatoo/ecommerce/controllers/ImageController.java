@@ -1,10 +1,10 @@
 package kg.alatoo.ecommerce.controllers;
 
+import kg.alatoo.ecommerce.dto.image.ImageResponse;
 import kg.alatoo.ecommerce.entities.Image;
 import kg.alatoo.ecommerce.repositories.ImageRepository;
 import kg.alatoo.ecommerce.services.ImageService;
 import kg.alatoo.ecommerce.services.ProductService;
-import kg.alatoo.ecommerce.services.impl.ImageServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -18,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ImageController {
 
-    @Autowired
-    private ImageServiceImpl imageServiceImpl;
     private final ImageRepository imageRepository;
     private final ProductService productService;
     private final ImageService imageService;
@@ -43,15 +41,15 @@ public class ImageController {
                 .body(resource);
     }
 
-    @DeleteMapping("/delete/{fileName}")
-    public String deleteFile(@PathVariable String fileName) {
-        imageService.deleteFile(fileName);
+    @DeleteMapping("/delete/{id}")
+    public String deleteFile(@PathVariable Long id) {
+        imageService.deleteFile(id);
         return "Image deleted successfully!";
     }
 
     @GetMapping("{id}")
-    public Image getById(@PathVariable Long id){
-        return imageRepository.findById(id).get();
+    public ImageResponse getById(@PathVariable Long id){
+        return imageService.showById(id);
     }
 
 }

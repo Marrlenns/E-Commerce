@@ -6,9 +6,15 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import jakarta.transaction.Transactional;
+import kg.alatoo.ecommerce.dto.image.ImageResponse;
+import kg.alatoo.ecommerce.entities.CartItem;
 import kg.alatoo.ecommerce.entities.Image;
+import kg.alatoo.ecommerce.entities.Order;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
+import kg.alatoo.ecommerce.mappers.ImageMapper;
+import kg.alatoo.ecommerce.repositories.CartItemRepository;
 import kg.alatoo.ecommerce.repositories.ImageRepository;
+import kg.alatoo.ecommerce.repositories.OrderRepository;
 import kg.alatoo.ecommerce.services.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +48,17 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private AmazonS3 s3Client;
+
     private final ImageRepository imageRepository;
+    private final ImageMapper imageMapper;
+    private final OrderRepository orderRepository;
+    private final CartItemRepository cartItemRepository;
 
     @Override
     @Transactional
     public Image uploadFile(MultipartFile file, Image oldDocument)  {
         if (oldDocument != null) {
-            deleteFile(oldDocument.getName());
+            deleteFile(oldDocument.getId());
         }
         return save(file);
     }
@@ -79,11 +89,11 @@ public class ImageServiceImpl implements ImageService {
 
 //        uploadFileToS3Bucket(file);
         log.info("File with name = {} has successfully uploaded", image.getName());
-        imageRepository.save(image);
-        String url = PATH+image.getId();
+        Image image1 = imageRepository.saveAndFlush(image);
+        String url = PATH+image1.getId();
 
-        image.setPath(url);
-        return imageRepository.save(image);
+        image1.setPath(url);
+        return imageRepository.saveAndFlush(image1);
     }
 
     private String validateFileName(String fileName) {
@@ -133,13 +143,40 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteFile(String fileName) {
-        Optional<Image> image = imageRepository.findByName(fileName);
+    public void deleteFile(Long id) {
+        Optional<Image> image = imageRepository.findById(id);
+//        System.out.println(image);
         if(image.isEmpty())
-            throw new NotFoundException("This image now found!", HttpStatus.NOT_FOUND);
+            throw new NotFoundException("This image not found!", HttpStatus.NOT_FOUND);
+        if(image.get().getProduct() != null){
+            image.get().getProduct().setImage(null);
+            image.get().setProduct(null);
+        }
+        if(image.get().getItems() != null){
+            for(CartItem item: image.get().getItems()){
+                item.setImage(null);
+                cartItemRepository.save(item);
+            }
+            image.get().setItems(null);
+        }
+        if(image.get().getOrders() != null){
+            for(Order order : image.get().getOrders()) {
+                order.setImage(null);
+                orderRepository.save(order);
+            }
+            image.get().setOrders(null);
+        }
         imageRepository.delete(image.get());
 //        s3Client.deleteObject(bucketName, fileName);
 //        return fileName + " removed ...";
+    }
+
+    @Override
+    public ImageResponse showById(Long id) {
+        Optional<Image> image = imageRepository.findById(id);
+        if(image.isEmpty())
+            throw new NotFoundException("Image not found!", HttpStatus.NOT_FOUND);
+        return imageMapper.toDetailDto(image.get());
     }
 
     private File convertMultiPartFileToFile(MultipartFile file) {

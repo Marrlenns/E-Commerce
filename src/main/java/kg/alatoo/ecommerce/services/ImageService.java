@@ -1,6 +1,7 @@
 package kg.alatoo.ecommerce.services;
 
 import jakarta.transaction.Transactional;
+import kg.alatoo.ecommerce.dto.image.ImageResponse;
 import kg.alatoo.ecommerce.entities.Image;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,5 +15,7 @@ public interface ImageService {
 
     byte[] downloadFile(String fileName);
 
-    void deleteFile(String fileName);
+    void deleteFile(Long id);
+
+    ImageResponse showById(Long id);
 }
