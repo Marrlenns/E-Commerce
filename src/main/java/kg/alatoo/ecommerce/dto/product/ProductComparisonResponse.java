@@ -13,6 +13,7 @@ import java.util.List;
 public class ProductComparisonResponse {
     private Long id1, id2;
     private String title1, title2;
+    private String imageName1, imageName2;
     private String rating1, rating2;
     private Integer revSize1, revSize2;
     private Integer price1, price2;

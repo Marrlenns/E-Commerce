@@ -1,10 +1,7 @@
 package kg.alatoo.ecommerce.services.impl;
 
 import kg.alatoo.ecommerce.dto.product.*;
-import kg.alatoo.ecommerce.entities.Category;
-import kg.alatoo.ecommerce.entities.Product;
-import kg.alatoo.ecommerce.entities.Review;
-import kg.alatoo.ecommerce.entities.User;
+import kg.alatoo.ecommerce.entities.*;
 import kg.alatoo.ecommerce.enums.Color;
 import kg.alatoo.ecommerce.enums.Size;
 import kg.alatoo.ecommerce.enums.Tag;
@@ -12,15 +9,14 @@ import kg.alatoo.ecommerce.exceptions.BadCredentialsException;
 import kg.alatoo.ecommerce.exceptions.BadRequestException;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
 import kg.alatoo.ecommerce.mappers.ProductMapper;
-import kg.alatoo.ecommerce.repositories.CategoryRepository;
-import kg.alatoo.ecommerce.repositories.ProductRepository;
-import kg.alatoo.ecommerce.repositories.ReviewRepository;
-import kg.alatoo.ecommerce.repositories.UserRepository;
+import kg.alatoo.ecommerce.repositories.*;
 import kg.alatoo.ecommerce.services.AuthService;
+import kg.alatoo.ecommerce.services.ImageService;
 import kg.alatoo.ecommerce.services.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +32,10 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
     private final ProductMapper productMapper;
     private final ReviewRepository reviewRepository;
+    private final ImageService imageService;
+    private final ImageRepository imageRepository;
+    private final CartItemRepository cartItemRepository;
+    private final OrderRepository orderRepository;
 
 
     @Override
@@ -174,6 +174,47 @@ public class ProductServiceImpl implements ProductService {
         if(product2.isEmpty())
             throw new BadRequestException("Product with id: " + idd + " - doesn't exist!");
         return productMapper.toCompareDtos(product1.get(), product2.get());
+    }
+
+    @Override
+    public void uploadFile(String token, MultipartFile file, Long id) {
+        User user = authService.getUserFromToken(token);
+        Product product = productRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("product not found!" + id, HttpStatus.NOT_FOUND));
+        if(user != product.getUser())
+            throw new BadRequestException("You can't edit this product!");
+        Image save;
+        List<Order> orders = null;
+        List<CartItem> items = null;
+        if(product.getImage() != null){
+            Image image = product.getImage();
+            items = image.getItems();
+            orders = image.getOrders();
+            save = imageService.uploadFile(file, image);
+            if(items != null){
+                List<CartItem> itemList = new ArrayList<>();
+                for(CartItem item: items){
+                    item.setImage(save);
+                    itemList.add(item);
+                    cartItemRepository.save(item);
+                }
+                save.setItems(itemList);
+            }
+            if(orders != null){
+                List<Order> orderList = new ArrayList<>();
+                for(Order order: orders){
+                    order.setImage(save);
+                    orderList.add(order);
+                    orderRepository.save(order);
+                }
+                save.setOrders(orderList);
+            }
+        } else save = imageService.uploadFile(file);
+
+        product.setImage(save);
+        productRepository.save(product);
+        save.setProduct(product);
+        imageRepository.save(save);
     }
 
 }

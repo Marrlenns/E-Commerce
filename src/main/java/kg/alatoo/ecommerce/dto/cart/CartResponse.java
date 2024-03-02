@@ -10,5 +10,6 @@ public class CartResponse {
     private List<Integer> prices;
     private List<Integer> quantities;
     private List<Integer> subtotals;
+    private List<String> imageNames;
     private Integer total;
 }

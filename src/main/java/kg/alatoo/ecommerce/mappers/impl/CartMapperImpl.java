@@ -18,6 +18,7 @@ public class CartMapperImpl implements CartMapper {
         List<Integer> prices = new ArrayList<>();
         List<Integer> quantities = new ArrayList<>();
         List<Integer> subtotals = new ArrayList<>();
+        List<String> imageNames = new ArrayList<>();
         Integer total = 0;
         List<CartItem> items = cart.getItems();
         for(CartItem item: items) {
@@ -26,12 +27,15 @@ public class CartMapperImpl implements CartMapper {
             quantities.add(item.getQuantity());
             subtotals.add(item.getSubtotal());
             total += item.getSubtotal();
+            if(item.getImage() != null)
+                imageNames.add(item.getImage().getName());
         }
         response.setTitles(titles);
         response.setPrices(prices);
         response.setQuantities(quantities);
         response.setSubtotals(subtotals);
         response.setTotal(total);
+        response.setImageNames(imageNames);
 
         return response;
     }

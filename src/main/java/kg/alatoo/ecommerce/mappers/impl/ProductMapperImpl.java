@@ -6,9 +6,11 @@ import kg.alatoo.ecommerce.dto.product.ProductResponse;
 import kg.alatoo.ecommerce.entities.Product;
 import kg.alatoo.ecommerce.entities.Review;
 import kg.alatoo.ecommerce.exceptions.NotFoundException;
+import kg.alatoo.ecommerce.mappers.ImageMapper;
 import kg.alatoo.ecommerce.mappers.ProductMapper;
 import kg.alatoo.ecommerce.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +19,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapperImpl implements ProductMapper {
+
+    private final ImageMapper imageMapper;
     
     public ProductResponse toDto(Product product){
         ProductResponse response = new ProductResponse();
         response.setId(product.getId());
+        if(product.getImage() != null)
+            response.setImageName(product.getImage().getName());
         response.setTitle(product.getTitle());
         response.setPrice(product.getPrice());
         response.setCategory(product.getCategory().getTitle());
@@ -41,6 +48,8 @@ public class ProductMapperImpl implements ProductMapper {
     public ProductDetailResponse toDetailDto(Product product) {
         ProductDetailResponse productResponse = new ProductDetailResponse();
         productResponse.setId(product.getId());
+        if(product.getImage() != null)
+            productResponse.setImage(imageMapper.toDetailDto(product.getImage()));
         productResponse.setTitle(product.getTitle());
         productResponse.setPrice(product.getPrice());
         productResponse.setDescription(product.getDescription());
@@ -69,6 +78,11 @@ public class ProductMapperImpl implements ProductMapper {
 
         response.setId1(product1.getId());
         response.setId2(product2.getId());
+
+        if(product1.getImage() != null)
+            response.setImageName1(product1.getImage().getName());
+        if(product2.getImage() != null)
+            response.setImageName2(product2.getImage().getName());
 
         response.setCategory1(product1.getCategory().getTitle());
         response.setCategory2(product2.getCategory().getTitle());

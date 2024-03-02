@@ -1,26 +1,30 @@
 package kg.alatoo.ecommerce.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
 @Entity
-@Data
-@Table(name = "cart_item_table")
-public class CartItem {
+@Table(name = "order_table")
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private LocalDateTime createDate;
     private String title;
     private Integer price;
+    private Integer total;
     private Integer quantity;
-    private Integer subtotal;
     private String sku;
+
+    @ManyToOne
+    private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Image image;
-
-    @ManyToOne
-    private Cart cart;
 }

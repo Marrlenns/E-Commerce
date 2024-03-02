@@ -22,6 +22,8 @@ public class Product {
     private Integer price;
     @Column(columnDefinition = "text")
     private String description;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Image image;
 
     @ElementCollection(targetClass = Color.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "product_colors", joinColumns = @JoinColumn(name = "product_id"))
