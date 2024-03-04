@@ -58,17 +58,20 @@ public class ProductMapperImpl implements ProductMapper {
         productResponse.setSizes(product.getSizes());
         productResponse.setCategory(product.getCategory().getTitle());
         productResponse.setSku(product.getSku());
-        double rating = 0;
+        double rating = 0, cnt = 0;
         List<String> reviews = new ArrayList<>();
         for(Review review: product.getReviews()){
-            rating += review.getStars();
+            if(review.getStars() != null){
+                rating += review.getStars();
+                cnt++;
+            }
             reviews.add(review.getText());
         }
         productResponse.setReviews(reviews);
         if(product.getReviews().isEmpty())
             productResponse.setRating("0.0");
         else
-            productResponse.setRating(String.format("%.1f", rating / product.getReviews().size()));
+            productResponse.setRating(String.format("%.1f", rating / ((int)cnt)));
         return productResponse;
     }
 
