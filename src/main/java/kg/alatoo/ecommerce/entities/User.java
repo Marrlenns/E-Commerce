@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -24,6 +26,37 @@ public class User implements UserDetails {
     private String password;
     private Role role;
 
+    @OneToMany
+    private List<Product> products;
+
+    @OneToMany
+    private List<Review> reviews;
+
+    @OneToOne
+    private Cart cart;
+
+    @OneToMany
+    private List<Order> orders;
+
+    private String firstName;
+    private String lastName;
+    private String companyName;
+    private String country;
+    private String streetAddress;
+    private String city;
+    private String province;
+    private String zipCode;
+    private String phone;
+    private String additionalInfo;
+    private String verifyCode;
+    private Boolean verified;
+    private String uuid;
+    @ManyToMany
+    private List<Product> favorites;
+
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null)
@@ -33,7 +66,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override
