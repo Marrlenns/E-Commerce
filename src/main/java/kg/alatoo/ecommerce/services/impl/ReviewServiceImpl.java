@@ -39,9 +39,19 @@ public class ReviewServiceImpl implements ReviewService {
 
         User user = authService.getUserFromToken(token);
 
+        List<Review> reviewList = reviewRepository.findByUserAndProduct(user, product.get());
+        boolean flag = false;
+        for(Review review: reviewList){
+            if(review.getStars() != null){
+                flag = true;
+                break;
+            }
+        }
+
         Review review = new Review();
         review.setText(request.getText());
-        review.setStars(request.getStars());
+        if(!flag)
+            review.setStars(request.getStars());
         review.setProduct(product.get());
         review.setUser(user);
         Review review1 = reviewRepository.saveAndFlush(review);
@@ -77,10 +87,15 @@ public class ReviewServiceImpl implements ReviewService {
         if (request.getStars() > 5 || request.getStars() < 0)
             throw new BadRequestException("U can rate this product only in range 0-5");
 
+        List<Review> reviews = reviewRepository.findByUserAndProduct(user, product.get());
+        for(Review review1: reviews)
+            review1.setStars(null);
+
         review.get().setText(request.getText());
         review.get().setStars(request.getStars());
         reviewRepository.save(review.get());
     }
+
 
     @Override
     public void deleteReview(String token, Long id, Long idd) {
