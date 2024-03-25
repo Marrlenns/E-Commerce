@@ -6,13 +6,9 @@ Ecommerce is a method of buying and selling goods and services online
 E-commerce applications provide users with a seamless and convenient shopping experience. Customers can browse through a wide range of products, compare prices, read reviews, and make purchases with just a few taps on their smartphones or clicks on their computers.
 
 
-## Authors
+## Author
 
 - BackEnd Developer: [@Marlen](https://www.github.com/Marrlenns)
-- BackEnd Developer: [@Bermet](https://www.github.com/isbembi)
-- BackEnd Developer: [@Sanjar](https://www.github.com/Sanjar233)
-- FrontEnd Developer: [@Emir](https://www.github.com/Emirkeenz)
-
 
 ## Contributing
 
